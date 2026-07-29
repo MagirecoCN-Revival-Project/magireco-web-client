@@ -234,7 +234,8 @@ function Client({ account, status, onLogout }: { account: Account; status: Serve
     return () => router.stop();
   }, []);
   const config = useMemo<RuntimeConfig>(() => ({
-    apiBaseUrl: (import.meta.env.VITE_GAME_API_BASE_URL as string | undefined) ?? apiBase.replace(/\/v1\/?$/, ""),
+    apiBaseUrl: (import.meta.env.VITE_GAME_API_BASE_URL as string | undefined)
+      ?? (apiBase.replace(/\/v1\/?$/, "") || window.location.origin),
     assetEntry: entry,
     accountId: account.id,
     accessToken,
