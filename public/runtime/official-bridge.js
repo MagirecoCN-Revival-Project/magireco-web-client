@@ -3,6 +3,17 @@
   if (window.__MAGIRECO_WEB_BRIDGE__) return;
   window.__MAGIRECO_WEB_BRIDGE__ = true;
 
+  var runtimeAppVersion = "3.1.9";
+  try {
+    Object.defineProperty(window, "app_ver", {
+      configurable: true,
+      get: function () { return runtimeAppVersion; },
+      set: function (value) {
+        if (value) runtimeAppVersion = String(value);
+      }
+    });
+  } catch (_) { window.app_ver = runtimeAppVersion; }
+
   var accountId = sessionStorage.getItem("magireco.runtime.account") || "web";
   var prefix = "magireco.cnv.state." + accountId;
   var stateCacheName = "magireco-player-state-v1";
@@ -75,8 +86,15 @@
       }
     }
   };
+  var browserAlert = window.alert.bind(window);
+  window.alert = function (value) {
+    if (typeof value === "string" && value.indexOf("game:") === 0) {
+      return window.androidCommand.jsCallback(value);
+    }
+    return browserAlert(value);
+  };
   window.NativeBridge = window.NativeBridge || {
-    getAppVersion: function () { return "3.0.1"; },
+    getAppVersion: function () { return runtimeAppVersion; },
     getBundleId: function () { return "web.magireco.cnv"; },
     getDeviceName: function () { return navigator.userAgent; },
     getOSVersion: function () { return navigator.platform || "Web"; },
