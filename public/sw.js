@@ -2,7 +2,7 @@ const SHELL_CACHE = "magireco-shell-v2";
 const RESOURCE_CACHE = "magireco-runtime-assets-v1";
 const STATE_CACHE = "magireco-player-state-v1";
 const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/runtime/official-bridge.js"];
-let runtimeConfig = { apiBaseUrl: "", accessToken: "", accountId: "web" };
+let runtimeConfig = { apiBaseUrl: self.location.origin, accessToken: "", accountId: "web" };
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL)));
@@ -26,7 +26,7 @@ self.addEventListener("message", (event) => {
   if (event.data?.type === "MAGIRECO_RUNTIME_CONFIG") {
     const config = event.data.config || {};
     runtimeConfig = {
-      apiBaseUrl: String(config.apiBaseUrl || "").replace(/\/+$/, ""),
+      apiBaseUrl: String(config.apiBaseUrl || self.location.origin).replace(/\/+$/, ""),
       accessToken: String(config.accessToken || ""),
       accountId: String(config.accountId || "web"),
     };
@@ -57,11 +57,6 @@ async function injectBridge(response) {
 }
 
 async function gameApi(request, url) {
-  if (!runtimeConfig.apiBaseUrl) {
-    return new Response(JSON.stringify({
-      error: { code: "GAME_API_NOT_CONFIGURED", message: "尚未配置游戏服务端地址" },
-    }), { status: 503, headers: { "content-type": "application/json; charset=utf-8" } });
-  }
   const target = new URL(url.pathname + url.search, runtimeConfig.apiBaseUrl);
   const headers = new Headers(request.headers);
   headers.delete("host");
