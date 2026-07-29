@@ -1,0 +1,10 @@
+{
+  "name": "神滨记录 · Web Client",
+  "short_name": "神滨记录",
+  "description": "Magireco CN Revival browser client",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0c1d",
+  "theme_color": "#111229",
+  "icons": []
+}
