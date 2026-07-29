@@ -1,0 +1,45 @@
+Additional permission under GNU GPL version 3 section 7
+========================================================
+
+Copyright (C) 2026 MagirecoCN-Revival-Project
+
+This file records an additional PERMISSION granted by the copyright
+holders of this Program, under section 7 of the GNU General Public
+License version 3.
+
+    If you modify this Program, or any covered work, by linking or
+    combining it with the Live2D Cubism SDK (including, without
+    limitation, the Cubism SDK for Web, the Cubism 2 SDK for WebGL,
+    the Cubism Core library, and any successor or modified version of
+    those SDKs), containing parts covered by the terms of the Live2D
+    Open Software License, the Live2D Proprietary Software License
+    Agreement, and/or any other Live2D Cubism SDK licensing terms, the
+    licensors of this Program grant you additional permission to convey
+    the resulting work.
+
+    You are further permitted to convey the Corresponding Source of a
+    work covered by this permission without including the source code
+    of the Live2D Cubism SDK itself.
+
+
+NOTES
+-----
+
+  * This permission concerns THIS Program only. It grants you no rights
+    whatsoever in the Live2D Cubism SDK. Use of that SDK remains subject
+    to Live2D Inc.'s own licensing terms, which you must satisfy
+    separately.
+
+  * As provided by GPLv3 section 7, a recipient may remove this
+    additional permission from a copy they convey. This is a permission,
+    not a restriction — removing it only forfeits the ability to link
+    against the Cubism SDK.
+
+  * Source files covered by this permission carry a header referencing
+    this file. A file that carries no such reference is licensed under
+    the GNU General Public License version 3 alone.
+
+  * SEPARATE FROM THIS FILE: additional TERMS (restrictions) on origin
+    and on the use of project and contributor names are stated in
+    LICENSE.additional-terms. Those are NOT removable by downstream
+    recipients. Do not conflate the two files.
