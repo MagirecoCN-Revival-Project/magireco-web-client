@@ -1,6 +1,7 @@
 import { BattleEngine, type AttackAction, type Fighter } from "../engine/battle";
 import { StoryOrchestrator, type ScenarioDocument } from "../engine/story";
 import type { NativeCommand } from "../types";
+import { OFFICIAL_COMMAND_NAMES } from "./officialCommands";
 
 interface CommandEvent {
   type: "MAGIRECO_NATIVE_COMMAND";
@@ -39,7 +40,23 @@ export class NativeRouter {
     this.listener = undefined;
   }
 
-  private async dispatch(command: NativeCommand) {
+  /**
+   * 把桥送来的命令名解析成可注册的名字。
+   *
+   * 桥（public/runtime/official-bridge.js）只解析线格式 `game:<码>,<载荷>`，
+   * 发出来的是 `native:<码>`；命令码表在 TS 侧，所以在这里查表换成官方常量名
+   * （如 271 -> SCENE_PUSH_QUEST）。查不到的码保留 `native:<码>` 原样，
+   * 这样诊断里能看到确切是哪个码没实现，而不是笼统的一句「不支持」。
+   */
+  private resolve(name: string): string {
+    if (!name.startsWith("native:")) return name;
+    const code = Number(name.slice(7));
+    const official = Number.isFinite(code) ? OFFICIAL_COMMAND_NAMES[code] : undefined;
+    return official ?? name;
+  }
+
+  private async dispatch(raw: NativeCommand) {
+    const command: NativeCommand = { ...raw, command: this.resolve(raw.command) };
     const handler = this.handlers.get(command.command);
     let result: NativeResult;
     if (!handler) {

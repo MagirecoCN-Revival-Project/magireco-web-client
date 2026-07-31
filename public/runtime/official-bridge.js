@@ -76,11 +76,46 @@
     return JSON.stringify({ accepted: true, id: message.id });
   }
 
+  // 官方线格式：game:<命令码>,<载荷>
+  //
+  // 载荷不保证是 JSON——底包 command.js 里实测有 JSON.stringify(...)、空串 ""、
+  // "{}"，也有 "\"a\iueo" 这种裸字符串。所以只能在**第一个逗号**处切开，
+  // 前半是码、后半原样保留，再尝试性地解析 JSON，失败就当纯文本。
+  //
+  // 早前的实现对整条消息做 JSON.parse，必然抛异常并退化成一个兜底分支，
+  // 98 个命令码全部丢失——那样接不上真实的官方包。
+  function parseGameMessage(raw) {
+    if (typeof raw !== "string" || raw.indexOf("game:") !== 0) return null;
+    var rest = raw.slice(5);
+    var comma = rest.indexOf(",");
+    var codeText = comma < 0 ? rest : rest.slice(0, comma);
+    var payloadText = comma < 0 ? "" : rest.slice(comma + 1);
+    var code = parseInt(codeText, 10);
+    if (!isFinite(code)) return null;
+    var payload = payloadText;
+    if (payloadText !== "") {
+      try { payload = JSON.parse(payloadText); } catch (_) { payload = payloadText; }
+    }
+    return { code: code, payload: payload, raw: raw };
+  }
+
   window.androidCommand = window.androidCommand || {
     jsCallback: function (raw) {
+      var parsed = parseGameMessage(raw);
+      if (parsed) {
+        // 桥只负责解析线格式，不查命令码表——表是 TS 侧
+        // src/runtime/officialCommands.ts 的单一真理源，本文件是 public/ 下的
+        // 纯 IIFE，引用不到它。命令名由 NativeRouter 解析。
+        return emit("native:" + parsed.code, {
+          code: parsed.code,
+          payload: parsed.payload,
+          raw: parsed.raw
+        });
+      }
+      // 非 game: 前缀的回调（少数路径会直接回传 JSON），保持原有宽松处理
       try {
-        var parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-        return emit(parsed.command || parsed.type || "callback", parsed);
+        var obj = typeof raw === "string" ? JSON.parse(raw) : raw;
+        return emit(obj.command || obj.type || "callback", obj);
       } catch (_) {
         return emit("callback", raw);
       }
